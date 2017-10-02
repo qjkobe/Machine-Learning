@@ -6,6 +6,9 @@ import numpy as np
 X = []
 Y = []
 
+# 其实书上的输入还有一个特征集A
+A = []
+
 
 def calc_empirical_entropy(X, Y):
     # 计算经验熵。先计算每一类（Y取值）的概率，各个取值结果保存在ck{}里，最终结果是返回值
@@ -24,11 +27,11 @@ def calc_empirical_entropy(X, Y):
     return res
 
 
-def calc_empirical_condi_entropy(num):
+def calc_empirical_condi_entropy(num, X, Y):
     # 计算第i个特征值对应的每个取值di，再计算这每个取值下对应Y中各个类别的数量dik，并求出hdi。最后求出这个特征值对应的经验条件熵
     len_x = len(X)
     len_y = len(Y)
-    di = {}
+    di = dict()
 
     for i in xrange(len_x):
         if X[i][num] in di:
@@ -50,11 +53,11 @@ def calc_empirical_condi_entropy(num):
     return res
 
 
-def calc_info_gain(num, hd):
+def calc_info_gain(num, hd, X, Y):
     # 结果是第i个特征值对应的信息增益
     res = 0
     res += hd
-    res -= calc_empirical_condi_entropy(num)
+    res -= calc_empirical_condi_entropy(num, X, Y)
     return res
 
 
@@ -66,9 +69,19 @@ if __name__ == "__main__":
     Y = [0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0]
     hd = calc_empirical_entropy(X, Y)
     max_info_gain = 0
-    for i in range(len(X[0])):
-        print calc_info_gain(i, hd)
-        if calc_info_gain(i, hd) > max_info_gain:
-            max_info_gain =  calc_info_gain(i, hd)
+    for i in xrange(len(X[0])):
+        print calc_info_gain(i, hd, X, Y)
+        if calc_info_gain(i, hd, X, Y) > max_info_gain:
+            max_info_gain =  calc_info_gain(i, hd, X, Y)
             max_index = i
-    print "最终结果是：" + str(max_info_gain) + "应该选择第" + str(max_index) + "个特征"
+    print "最终结果是：" + str(max_info_gain) + "\n应该选择第" + str(max_index) + "个特征"
+
+    A = ["年龄", "有工作", "有自己的房子", "信贷情况"]
+    hd = calc_empirical_entropy(X, Y)
+    max_info_gain = 0
+    for i in xrange(len(A)):
+        print calc_info_gain(i, hd, X, Y)
+        if calc_info_gain(i, hd, X, Y) > max_info_gain:
+            max_info_gain = calc_info_gain(i, hd, X, Y)
+            max_index = i
+    print "最终结果是：" + str(max_info_gain) + "\n应该选择第\"" + str(A[max_index]) + "\"这个特征"
